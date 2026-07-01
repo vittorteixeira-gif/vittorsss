@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cidadania Digital & IA | Proteção contra Deepfakes</title>
+    <style>
+        /* ==========================================================================
+           1. VARIÁVEIS DE COR E ESTILOS GERAIS (VISUAL CYBERPUNK / TECH CLEAN)
+           ========================================================================== */
+        :root {
+            --bg-color: #05050d;
+            --bg-gradient: linear-gradient(135deg, #05050d 0%, #0c0b1e 50%, #05050d 100%);
+            --card-bg: rgba(13, 13, 29, 0.75);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --neon-cyan: #00ffcc;
+            --neon-purple: #9d4edd;
+            --border-glow: rgba(0, 255, 204, 0.2);
+            --card-shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f0f4f8;
+            --bg-gradient: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --neon-cyan: #0284c7;
+            --neon-purple: #6d28d9;
+            --border-glow: rgba(2, 132, 199, 0.2);
+            --card-shadow: rgba(148, 163, 184, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg-color) var(--bg-gradient) fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Efeito de grade cibernética ao fundo */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ==========================================================================
+           2. LAYOUT DO CABEÇALHO (NAVIGATION)
+           ========================================================================== */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            background: rgba(5, 5, 13, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--neon-cyan);
+        }
+
+        .btn-theme {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .btn-theme:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        /* ==========================================================================
+           3. SEÇÃO HERO (DOBRALHA PRINCIPAL)
+           ========================================================================== */
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            letter-spacing: -1px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.3rem;
+            max-width: 750px;
+            margin: 0 auto 40px;
+            color: var(--text-muted);
+        }
+
+        .btn-cta {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 25px rgba(157, 78, 221, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 255, 204, 0.5);
+        }
+
+        /* ==========================================================================
+           4. SEÇÕES EXTENSAS DE CONTEÚDO (MÓDULOS DE INFORMAÇÃO)
+           ========================================================================== */
+        section {
+            padding: 100px 10%;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Grid de Cartões Usando Flexbox Flexível */
+        .grid-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .card-futuristic {
+            background: var(--card-bg);
+            border: 1px solid var(--border-glow);
+            padding: 40px;
+            border-radius: 20px;
+            flex: 1 1 350px;
+            box-shadow: 0 15px 35px var(--card-shadow);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card-futuristic:hover {
+            transform: translateY(-8px);
+            border-color: var(--neon-purple);
+        }
+
+        .card-futuristic .icon-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--neon-cyan);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .card-futuristic h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        .card-futuristic p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* ==========================================================================
+           5. SEÇÃO GUIA DE ANÁLISE (LISTA INTEGRADA)
+           ========================================================================== */
+        .guide-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            background: var(--card-bg);
+            border: 1px solid var(--border-glow);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px var(--card-shadow);
+        }
+
+        .step-number {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--neon-cyan);
+            margin-right: 25px;
+            line-height: 1;
+        }
+
+        .step-info h4 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .step-info p {
+            color: var(--text-muted);
+        }
+
+        /* ==========================================================================
+           6. SEÇÃO INTERATIVA: O QUIZ VALIDADO EM JAVASCRIPT
+           ========================================================================== */
+        .quiz-wrapper {
+            background: var(--card-bg);
+            border: 1px solid var(--border-glow);
+            padding: 50px 8%;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px var(--card-shadow);
+        }
+
+        .quiz-block {
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--neon-purple);
+        }
+
+        .quiz-block p {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .quiz-options label {
+            display: block;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 14px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .quiz-options label:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--border-glow);
+        }
+
+        .quiz-options input[type="radio"] {
+            margin-right: 12px;
+            accent-color: var(--neon-cyan);
+        }
+
+        .btn-verify {
+            width: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            color: #ffffff;
+            border: none;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(0, 255, 204, 0.2);
+            transition: opacity 0.3s;
+        }
+
+        .btn-verify:hover {
+            opacity: 0.9;
+        }
+
+        .panel-result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border: 1px solid transparent;
+        }
+
+        .panel-result.success {
+            background: rgba(0, 255, 204, 0.1);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .hidden-element {
+            display: none;
+        }
+
+        /* ==========================================================================
+           7. RODAPÉ (FOOTER)
+           ========================================================================== */
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            border-top: 1px solid var(--border-glow);
+            background: rgba(5, 5, 13, 0.9);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ==========================================================================
+           8. RESPONSIVIDADE COMPLETA (MEDIA QUERIES)
+           ========================================================================== */
+        @media (max-width: 968px) {
+            section { padding: 70px 5%; }
+            .hero-content h1 { font-size: 3rem; }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+            nav ul { gap: 20px; }
+            .hero-content h1 { font-size: 2.2rem; }
+            .step-item { flex-direction: column; }
+            .step-number { margin-bottom: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Mente<span>.Digital</span></div>
+        <nav>
+            <ul>
+                <li><a href="#ameaca">A Ameaça</a></li>
+                <li><a href="#deteccao">Como Detectar</a></li>
+                <li><a href="#desafio">O Desafio</a></li>
+            </ul>
+        </nav>
+        <button id="theme-btn" class="btn-theme">Modo Cor</button>
+    </header>
+
+    <main>
+        
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Cidadania Digital e a Infodemia das <span class="gradient-text">Deepfakes</span></h1>
+                <p>Na intersecção entre a Inteligência Artificial avançada e a segurança social, discernir a verdade tornou-se o nosso maior escudo. Desenvolva sua percepção crítica hoje.</p>
+                <a href="#desafio" class="btn-cta">Iniciar Teste de Defesa</a>
+            </div>
+        </section>
+
+        <section id="ameaca">
+            <div class="section-header">
+                <h2>O Impacto da IA na Sociedade</h2>
+                <p>Como algoritmos generativos profundos estão redefinindo as fronteiras da confiança e da informação na internet.</p>
+            </div>
+            
+            <div class="grid-layout">
+                <div class="card-futuristic">
+                    <span class="icon-tag">Definição</span>
+                    <h3>O Fenômeno Deepfake</h3>
+                    <p>Utilizando arquiteturas de redes neurais conhecidas como GANs (Redes Adversárias Generativas), sistemas clonam vozes, alteram expressões faciais e geram falas completas imitando pessoas reais de forma assustadoramente convincente.</p>
+                </div>
+
+                <div class="card-futuristic">
+                    <span class="icon-tag">Perigo</span>
+                    <h3>Desinformação em Massa</h3>
+                    <p>A automatização na geração de mentiras possibilita que campanhas massivas de desinformação atinjam milhões de usuários simultaneamente, influenciando eleições, mercados econômicos globais e reputações pessoais.</p>
+                </div>
+
+                <div class="card-futuristic">
+                    <span class="icon-tag">Ética</span>
+                    <h3>Cidadania Digital</h3>
+                    <p>Ser um cidadão digital ético exige responsabilidade. Não repassar conteúdos sem checagem prévia e entender que mídias visuais e sonoras não são mais provas absolutas de fatos são os primeiros passos.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="deteccao">
+            <div class="section-header">
+                <h2>Guia de Sobrevivência Digital</h2>
+                <p>Aprenda a analisar os mínimos detalhes técnicos que as IAs atuais ainda falham ao renderizar.</p>
+            </div>
+
+            <div class="guide-container">
+                <div class="step-item">
+                    <div class="step-number">01</div>
+                    <div class="step-info">
+                        <h4>Inconsistências Biométricas</h4>
+                        <p>Analise os olhos. Muitas mídias manipuladas apresentam padrões de piscadas artificiais, falta de reflexo natural da luz nas pupilas ou falhas na movimentação das pálpebras.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">02</div>
+                    <div class="step-info">
+                        <h4>Desconexão Fonética</h4>
+                        <p>Observe atentamente a sincronia dos lábios com os fonemas emitidos. O áudio gerado por IA pode ter pequenos atrasos ou formatos labiais que não coincidem com sons complexos.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">03</div>
+                    <div class="step-info">
+                        <h4>Artefatos de Borda</h4>
+                        <p>Procure por desfoques anômalos nas áreas de transição entre o queixo e o pescoço, ou ao redor dos fios de cabelo. As IAs costumam borrar essas regiões para mesclar as imagens.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="desafio">
+            <div class="section-header">
+                <h2>Laboratório de Verificação</h2>
+                <p>Aplique seus novos conceitos e descubra se sua percepção está afiada para a era sintética.</p>
+            </div>
+
+            <div class="quiz-wrapper">
+                <form id="form-interativo">
+                    
+                    <div class="quiz-block">
+                        <p>1. Ao se deparar com um vídeo polêmico de um político que parece real, qual o procedimento correto de cidadania digital?</p>
+                        <div class="quiz-options">
+                            <label>
+                                <input type="radio" name="pergunta1" value="falso" required> Compartilhar imediatamente nos grupos para alertar conhecidos.
+                            </label>
+                            <label>
+                                <input type="radio" name="pergunta1" value="verdadeiro"> Reter o compartilhamento e pesquisar o fato em agências de checagem confiáveis.
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-block">
+                        <p>2. Tecnicamente, qual elemento abaixo é uma pista frequente de uma imagem/vídeo manipulado por inteligência artificial?</p>
+                        <div class="quiz-options">
+                            <label>
+                                <input type="radio" name="pergunta2" value="verdadeiro" required> Iluminação inconsistente e falta de reflexo natural nos olhos.
+                            </label>
+                            <label>
+                                <input type="radio" name="pergunta2" value="falso"> O arquivo estar em alta definição (formato MP4 ou 4K).
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-verify">Processar Diagnóstico</button>
+                </form>
+
+                <div id="bloco-resultado" class="panel-result hidden-element"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 - Consciência Digital e Inteligência Artificial</p>
+        <p>Desenvolvido exclusivamente para fins educacionais e avaliativos.</p>
+    </footer>
+
+    <script>
+        // Alternador de Temas (Claro / Escuro)
+        const btnTema = document.getElementById('theme-btn');
+        btnTema.addEventListener('click', () => {
+            const temaAtual = document.body.getAttribute('data-theme');
+            if (temaAtual === 'light') {
+                document.body.removeAttribute('data-theme');
+            } else {
+                document.body.setAttribute('data-theme', 'light');
+            }
+        });
+
+        // Validador e Processador do Quiz Dinâmico
+        const formQuiz = document.getElementById('form-interativo');
+        const painelResultado = document.getElementById('bloco-resultado');
+
+        formQuiz.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const r1 = document.querySelector('input[name="pergunta1"]:checked').value;
+            const r2 = document.querySelector('input[name="pergunta2"]:checked').value;
+
+            let pontuacao = 0;
+            if (r1 === 'verdadeiro') pontuacao++;
+            if (r2 === 'verdadeiro') pontuacao++;
+
+            painelResultado.classList.remove('hidden-element', 'success');
+            painelResultado.classList.add('success');
+
+            if(pontuacao === 2) {
+                painelResultado.innerHTML = `🎯 Incrível! Pontuação: 2/2. Sua percepção crítica e cidadania digital estão impecáveis!`;
+            } else {
+                painelResultado.innerHTML = `⚠️ Pontuação: ${pontuacao}/2. Atenção! Revise as diretrizes de combate para não propagar conteúdos sintéticos falsos.`;
+            }
+        });
+    </script>
+</body>
+</html>
